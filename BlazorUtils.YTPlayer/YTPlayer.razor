@@ -1,0 +1,30 @@
+﻿@inject Microsoft.JSInterop.IJSRuntime JSR
+
+<div>
+    <button class="btn btn-info" @onclick="LoadYT">Load YT Player</button>
+
+    <br />
+    <br />
+
+    <div id="ytplayer">
+        This Blazor component is defined in the <strong>BlazorUtils.YTPlayer</strong> package.
+    </div>
+</div>
+
+@code {
+
+    string name;
+
+    async void GetName()
+    {
+        name = await new YTPlayerJsInterop(JSR).Prompt("What's your name ?");
+        Console.WriteLine($"got name = {name}");
+        StateHasChanged();
+    }
+
+    async void LoadYT()
+    {
+        Console.WriteLine("LoadYT()");
+        await new YTPlayerJsInterop(JSR).LoadYT();
+    }
+}

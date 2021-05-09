@@ -11,20 +11,30 @@ namespace BlazorUtils.YTPlayer
     // This class can be registered as scoped DI service and then injected into Blazor
     // components for use.
 
-    public class ExampleJsInterop : IAsyncDisposable
+    public class YTPlayerJsInterop : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
 
-        public ExampleJsInterop(IJSRuntime jsRuntime)
+        public YTPlayerJsInterop(IJSRuntime jsRuntime)
         {
             moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-               "import", "./_content/BlazorUtils.YTPlayer/exampleJsInterop.js").AsTask());
+               "import", "./_content/BlazorUtils.YTPlayer/ytplayer.js").AsTask());
         }
 
         public async ValueTask<string> Prompt(string message)
         {
             var module = await moduleTask.Value;
             return await module.InvokeAsync<string>("showPrompt", message);
+        }
+
+        public async ValueTask LoadYT()
+        {
+            var module = await moduleTask.Value;
+            await module.InvokeAsync<string>("loadYTPlayer");
+            await Task.Delay(1000);
+            await module.InvokeAsync<string>("onYouTubePlayerAPIReady");
+            await Task.Delay(10000);
+            await module.InvokeAsync<string>("playVideo");
         }
 
         public async ValueTask DisposeAsync()
