@@ -11,15 +11,22 @@
 @code {
 
     private YTPlayerJsInterop JsInterop { get; set; }
+    private bool JsInteropLoadComplete { get; set; }
 
-    private async void PlayerDivClicked()
+    private async Task PlayerDivClicked()
     {
+        await LoadYT();
         await JsInterop.TogglePlayPause();
     }
 
     private async Task LoadYT()
     {
-        await JsInterop.LoadYT();
+        if (!JsInteropLoadComplete)
+        {
+            JsInterop = new YTPlayerJsInterop(JSR);
+            JsInteropLoadComplete = true;
+            await JsInterop.LoadYT();
+        }
     }
 
     /// <summary>
@@ -28,6 +35,7 @@
     /// <param name="videoId"></param>
     public async Task LoadVideo(string videoId)
     {
+        await LoadYT();
         await JsInterop.LoadVideoById(videoId);
     }
 
@@ -37,6 +45,7 @@
     /// </summary>
     public async Task PlayVideo()
     {
+        await LoadYT();
         await JsInterop.PlayVideo();
     }
 
@@ -45,14 +54,7 @@
     /// </summary>
     public async Task PauseVideo()
     {
-        await JsInterop.PauseVideo();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        JsInterop = new YTPlayerJsInterop(JSR);
         await LoadYT();
+        await JsInterop.PauseVideo();
     }
 }

@@ -27,6 +27,7 @@ namespace BlazorUtils.YTPlayer
             await module.InvokeVoidAsync("loadYTPlayer");
             await Task.Delay(1000);
             await module.InvokeVoidAsync("onYouTubePlayerAPIReady");
+            await Task.Delay(1000);
         }
 
         public async ValueTask LoadVideoById(string videoId)
