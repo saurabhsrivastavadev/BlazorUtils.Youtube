@@ -1,0 +1,23 @@
+﻿@page "/"
+@page "/ytplayerdemo"
+
+<h1>YTPlayer Demo</h1>
+
+<p>Here goes..</p>
+
+<BlazorUtils.YTPlayer.YTPlayer @ref="player"></BlazorUtils.YTPlayer.YTPlayer>
+
+@code {
+
+    BlazorUtils.YTPlayer.YTPlayer player;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (player != null)
+        {
+            Console.WriteLine("Got YTPlayer instance.");
+        }
+    }
+}

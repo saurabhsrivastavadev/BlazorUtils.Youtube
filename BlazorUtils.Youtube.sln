@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorUtils.YTPlayer", "BlazorUtils.YTPlayer\BlazorUtils.YTPlayer.csproj", "{9464B590-E02F-4DF5-BA28-4740DCB9538A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorUtils.YTPlayer", "BlazorUtils.YTPlayer\BlazorUtils.YTPlayer.csproj", "{9464B590-E02F-4DF5-BA28-4740DCB9538A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorUtils.YoutubeDemo", "BlazorUtils.YoutubeDemo\BlazorUtils.YoutubeDemo.csproj", "{98270BBC-D5E4-4527-A854-694EF29B9317}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9464B590-E02F-4DF5-BA28-4740DCB9538A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9464B590-E02F-4DF5-BA28-4740DCB9538A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9464B590-E02F-4DF5-BA28-4740DCB9538A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98270BBC-D5E4-4527-A854-694EF29B9317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98270BBC-D5E4-4527-A854-694EF29B9317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98270BBC-D5E4-4527-A854-694EF29B9317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98270BBC-D5E4-4527-A854-694EF29B9317}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
