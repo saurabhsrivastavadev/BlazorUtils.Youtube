@@ -1,30 +1,58 @@
 ﻿@inject Microsoft.JSInterop.IJSRuntime JSR
 
 <div>
-    <button class="btn btn-info" @onclick="LoadYT">Load YT Player</button>
-
-    <br />
-    <br />
-
-    <div id="ytplayer">
-        This Blazor component is defined in the <strong>BlazorUtils.YTPlayer</strong> package.
+    <div @onclick="PlayerDivClicked">
+        <div id="ytplayer" style="pointer-events: none;">
+            Loading the player..
+        </div>
     </div>
 </div>
 
 @code {
 
-    string name;
+    private YTPlayerJsInterop JsInterop { get; set; }
 
-    async void GetName()
+    private async void PlayerDivClicked()
     {
-        name = await new YTPlayerJsInterop(JSR).Prompt("What's your name ?");
-        Console.WriteLine($"got name = {name}");
-        StateHasChanged();
+        await JsInterop.TogglePlayPause();
     }
 
-    async void LoadYT()
+    private async Task LoadYT()
     {
-        Console.WriteLine("LoadYT()");
-        await new YTPlayerJsInterop(JSR).LoadYT();
+        await JsInterop.LoadYT();
+    }
+
+    /// <summary>
+    /// Load the youtube vieo specified by video id string
+    /// </summary>
+    /// <param name="videoId"></param>
+    public async Task LoadVideo(string videoId)
+    {
+        await JsInterop.LoadVideoById(videoId);
+    }
+
+    /// <summary>
+    /// Play the loaded video.
+    /// Must be invoked after a video is loaded via LoadVideo API
+    /// </summary>
+    public async Task PlayVideo()
+    {
+        await JsInterop.PlayVideo();
+    }
+
+    /// <summary>
+    /// Pause the loaded video.
+    /// </summary>
+    public async Task PauseVideo()
+    {
+        await JsInterop.PauseVideo();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        JsInterop = new YTPlayerJsInterop(JSR);
+        await LoadYT();
     }
 }

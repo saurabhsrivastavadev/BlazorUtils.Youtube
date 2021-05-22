@@ -1,20 +1,18 @@
-// This is a JavaScript module that is loaded on demand. It can export any number of
-// functions, and may import other JavaScript modules if required.
+// This is a JavaScript module that is loaded on demand. 
+// It can export any number of functions, and may import 
+// other JavaScript modules if required.
 
-export function showPrompt(message) {
-
-    return prompt(message, 'Type anything here');
-}
-
-export var player;
+let player;
+let isVideoLoaded = false;
 
 export function onYouTubePlayerAPIReady() {
 
     player = new YT.Player('ytplayer', {
         height: '360',
         width: '640',
-        videoId: 'M7lc1UVf-VE'
+        playerVars: { 'controls': 0, 'rel': 0 }
     });
+    console.log('Created YT.Player instance.');
 }
 
 export function loadYTPlayer() {
@@ -28,5 +26,41 @@ export function loadYTPlayer() {
 
 export function playVideo() {
 
+    if (!isVideoLoaded) {
+        console.error('video not yet loaded.');
+        return;
+    }
     player.playVideo();
+}
+
+export function pauseVideo() {
+
+    if (!isVideoLoaded) {
+        console.error('video not yet loaded.');
+        return;
+    }
+    player.pauseVideo();
+}
+
+export function loadVideoById(videoId) {
+
+    player.loadVideoById({
+        'videoId': videoId,
+    });
+    isVideoLoaded = true;
+}
+
+export function togglePlayPause() {
+
+    if (!isVideoLoaded) {
+        console.error('video not yet loaded.');
+        return;
+    }
+
+    let state = player.getPlayerState();
+    if (state === 1) {
+        player.pauseVideo();
+    } else {
+        player.playVideo();
+    }
 }

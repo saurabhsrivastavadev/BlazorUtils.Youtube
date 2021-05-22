@@ -21,20 +21,36 @@ namespace BlazorUtils.YTPlayer
                "import", "./_content/BlazorUtils.YTPlayer/ytplayer.js").AsTask());
         }
 
-        public async ValueTask<string> Prompt(string message)
-        {
-            var module = await moduleTask.Value;
-            return await module.InvokeAsync<string>("showPrompt", message);
-        }
-
         public async ValueTask LoadYT()
         {
             var module = await moduleTask.Value;
-            await module.InvokeAsync<string>("loadYTPlayer");
+            await module.InvokeVoidAsync("loadYTPlayer");
             await Task.Delay(1000);
-            await module.InvokeAsync<string>("onYouTubePlayerAPIReady");
-            await Task.Delay(10000);
-            await module.InvokeAsync<string>("playVideo");
+            await module.InvokeVoidAsync("onYouTubePlayerAPIReady");
+        }
+
+        public async ValueTask LoadVideoById(string videoId)
+        {
+            var module = await moduleTask.Value;
+            await module.InvokeVoidAsync("loadVideoById", videoId);
+        }
+
+        public async ValueTask PlayVideo()
+        {
+            var module = await moduleTask.Value;
+            await module.InvokeVoidAsync("playVideo");
+        }
+
+        public async ValueTask PauseVideo()
+        {
+            var module = await moduleTask.Value;
+            await module.InvokeVoidAsync("pauseVideo");
+        }
+
+        public async ValueTask TogglePlayPause()
+        {
+            var module = await moduleTask.Value;
+            await module.InvokeVoidAsync("togglePlayPause");
         }
 
         public async ValueTask DisposeAsync()
