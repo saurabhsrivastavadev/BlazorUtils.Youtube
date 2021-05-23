@@ -1,1 +1,11 @@
-﻿
+﻿.suggestion-row {
+    display: flex;
+    overflow-x: auto;
+}
+.suggestion-row::-webkit-scrollbar {
+    display: none;
+}
+
+img {
+    margin: 5px;
+}

@@ -1,14 +1,22 @@
 ﻿@inject Microsoft.JSInterop.IJSRuntime JSR
 
-<div style="height:@(HeightPx)px;">
-    <div @onclick="PlayerDivClicked" style="width: 100%; height: @(HeightPx - CarouselHeightPx)px;">
+<div class="main-container" style="height:@(HeightPx)px;">
+
+    <div class="player-row" @onclick="PlayerDivClicked" style="width: 100%; height: @(HeightPx - CarouselHeightPx)px;">
         <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%;">
             Loading the player..
         </div>
     </div>
-    <div id="carousel" style="height: @(CarouselHeightPx)px; border: solid; display: @CarouselDisplay;">
-        Hello World...
+
+    <div class="suggestion-row" style="width: 100%; height: @(CarouselHeightPx)px; border: solid; display: @CarouselDisplay;">
+        @for (int i = 0; i < 10; i++)
+        {
+            <div class="suggestion-element">
+                <img height="@(CarouselHeightPx-15)px" src="https://img.youtube.com/vi/xe-yweRpgZ0/0.jpg">
+            </div>
+        }
     </div>
+
 </div>
 
 @code {
@@ -35,7 +43,12 @@
     private async Task PlayerDivClicked()
     {
         await LoadYT();
-        if (CarouselDisplay == "normal")
+        await ToggleCarousel();
+    }
+
+    private async Task ToggleCarousel()
+    {
+        if (CarouselDisplay == "flex")
         {
             CarouselDisplay = "none";
             CarouselHeightPx = 0;
@@ -43,7 +56,7 @@
         }
         else
         {
-            CarouselDisplay = "normal";
+            CarouselDisplay = "flex";
             CarouselHeightPx = 150;
             await JsInterop.PauseVideo();
         }
