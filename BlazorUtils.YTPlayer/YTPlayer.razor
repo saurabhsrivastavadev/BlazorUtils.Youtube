@@ -1,24 +1,26 @@
 ﻿@inject Microsoft.JSInterop.IJSRuntime JSR
 
-<div @onclick="PlayerDivClicked" style="height:@(HeightPx)px;">
-    <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%;">
-        Loading the player..
+<div style="height:@(HeightPx)px;">
+    <div @onclick="PlayerDivClicked" style="width: 100%; height: @(HeightPx - CarouselHeightPx)px;">
+        <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%;">
+            Loading the player..
+        </div>
+    </div>
+    <div id="carousel" style="height: @(CarouselHeightPx)px; border: solid; display: @CarouselDisplay;">
+        Hello World...
     </div>
 </div>
 
 @code {
 
     [Parameter]
-    public int HeightPx { get; set; } = 400;
+    public int HeightPx { get; set; } = 500;
 
     private YTPlayerJsInterop JsInterop { get; set; }
     private bool JsInteropLoadComplete { get; set; }
 
-    private async Task PlayerDivClicked()
-    {
-        await LoadYT();
-        await JsInterop.TogglePlayPause();
-    }
+    private int CarouselHeightPx { get; set; } = 0;
+    private string CarouselDisplay { get; set; } = "none";
 
     private async Task LoadYT()
     {
@@ -27,6 +29,23 @@
             JsInterop = new YTPlayerJsInterop(JSR);
             JsInteropLoadComplete = true;
             await JsInterop.LoadYT();
+        }
+    }
+
+    private async Task PlayerDivClicked()
+    {
+        await LoadYT();
+        if (CarouselDisplay == "normal")
+        {
+            CarouselDisplay = "none";
+            CarouselHeightPx = 0;
+            await JsInterop.PlayVideo();
+        }
+        else
+        {
+            CarouselDisplay = "normal";
+            CarouselHeightPx = 150;
+            await JsInterop.PauseVideo();
         }
     }
 
