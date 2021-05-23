@@ -1,6 +1,6 @@
 ﻿@inject Microsoft.JSInterop.IJSRuntime JSR
 
-<div class="main-container" style="height:@(HeightPx)px;">
+<div class="main-container" style="width: @Width; height:@(HeightPx)px;">
 
     <div class="player-row" @onclick="PlayerDivClicked" style="width: 100%; height: @(HeightPx - CarouselHeightPx)px;">
         <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%;">
@@ -8,7 +8,7 @@
         </div>
     </div>
 
-    <div class="suggestion-row" style="width: 100%; height: @(CarouselHeightPx)px; border: solid; display: @CarouselDisplay;">
+    <div class="suggestion-row" style="height: @(CarouselHeightPx) px; display: @CarouselDisplay;">
         @for (int i = 0; i < 10; i++)
         {
             <div class="suggestion-element">
@@ -23,6 +23,9 @@
 
     [Parameter]
     public int HeightPx { get; set; } = 500;
+
+    [Parameter]
+    public string Width { get; set; } = "100%";
 
     private YTPlayerJsInterop JsInterop { get; set; }
     private bool JsInteropLoadComplete { get; set; }
