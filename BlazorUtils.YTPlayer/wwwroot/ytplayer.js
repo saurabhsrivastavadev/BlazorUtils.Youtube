@@ -8,8 +8,6 @@ let isVideoLoaded = false;
 export function onYouTubePlayerAPIReady() {
 
     player = new YT.Player('ytplayer', {
-        height: '360',
-        width: '640',
         playerVars: { 'controls': 0, 'rel': 0 }
     });
     console.log('Created YT.Player instance.');

@@ -5,7 +5,7 @@
 
 <p>Here goes..</p>
 
-<BlazorUtils.YTPlayer.YTPlayer @ref="player"></BlazorUtils.YTPlayer.YTPlayer>
+<BlazorUtils.YTPlayer.YTPlayer @ref="player" HeightPx="600"></BlazorUtils.YTPlayer.YTPlayer>
 
 @code {
 
@@ -17,7 +17,8 @@
 
         if (player != null)
         {
-            Console.WriteLine("Got YTPlayer instance.");
+            await player.LoadVideo("M7lc1UVf-VE");
+            await player.PlayVideo();
         }
     }
 }

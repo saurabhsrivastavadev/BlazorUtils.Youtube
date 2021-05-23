@@ -1,14 +1,15 @@
 ﻿@inject Microsoft.JSInterop.IJSRuntime JSR
 
-<div>
-    <div @onclick="PlayerDivClicked">
-        <div id="ytplayer" style="pointer-events: none;">
-            Loading the player..
-        </div>
+<div @onclick="PlayerDivClicked" style="height:@(HeightPx)px;">
+    <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%;">
+        Loading the player..
     </div>
 </div>
 
 @code {
+
+    [Parameter]
+    public int HeightPx { get; set; } = 400;
 
     private YTPlayerJsInterop JsInterop { get; set; }
     private bool JsInteropLoadComplete { get; set; }
