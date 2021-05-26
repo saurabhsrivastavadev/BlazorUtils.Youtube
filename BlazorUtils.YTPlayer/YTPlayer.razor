@@ -8,14 +8,17 @@
         </div>
     </div>
 
-    <div class="suggestion-row" style="height: @(CarouselHeightPx) px; display: @CarouselDisplay;">
-        @for (int i = 0; i < 10; i++)
-        {
-            <div class="suggestion-element">
-                <img height="@(CarouselHeightPx-15)px" src="https://img.youtube.com/vi/xe-yweRpgZ0/0.jpg">
-            </div>
-        }
-    </div>
+    @if (SuggestionVideoIdList != null && SuggestionVideoIdList.Count > 0)
+    {
+        <div class="suggestion-row" style="height: @(CarouselHeightPx) px; display: @CarouselDisplay;">
+            @foreach (var videoId in SuggestionVideoIdList)
+            {
+                <div class="suggestion-element" @onclick="_ => SuggestionVideoClicked(videoId)">
+                    <img height="@(CarouselHeightPx-15)px" src="https://img.youtube.com/vi/@(videoId)/0.jpg">
+                </div>
+            }
+        </div>
+    }
 
 </div>
 
@@ -27,11 +30,16 @@
     [Parameter]
     public string Width { get; set; } = "100%";
 
+    [Parameter]
+    public List<string> SuggestionVideoIdList { get; set; }
+
     private YTPlayerJsInterop JsInterop { get; set; }
     private bool JsInteropLoadComplete { get; set; }
 
     private int CarouselHeightPx { get; set; } = 0;
     private string CarouselDisplay { get; set; } = "none";
+
+    private string LoadedVideoId { get; set; } = null;
 
     private async Task LoadYT()
     {
@@ -46,23 +54,38 @@
     private async Task PlayerDivClicked()
     {
         await LoadYT();
-        await ToggleCarousel();
+        await TogglePlaybackAndCarousel();
     }
 
-    private async Task ToggleCarousel()
+    private async Task TogglePlaybackAndCarousel()
     {
-        if (CarouselDisplay == "flex")
+        // Toggle playback first and then carousel based on player state
+        await JsInterop.TogglePlayPause();
+        await RefreshCarouselState();
+    }
+
+    private async Task RefreshCarouselState()
+    {
+        bool suggestionsAvailable =
+            SuggestionVideoIdList != null && SuggestionVideoIdList.Count > 0;
+        bool isVideoPlaying = await JsInterop.IsVideoPlaying();
+
+        if (!suggestionsAvailable || isVideoPlaying)
         {
             CarouselDisplay = "none";
             CarouselHeightPx = 0;
-            await JsInterop.PlayVideo();
         }
         else
         {
             CarouselDisplay = "flex";
             CarouselHeightPx = 150;
-            await JsInterop.PauseVideo();
         }
+    }
+
+    private async Task SuggestionVideoClicked(string videoId)
+    {
+        await LoadVideo(videoId);
+        await PlayVideo();
     }
 
     /// <summary>
@@ -71,8 +94,11 @@
     /// <param name="videoId"></param>
     public async Task LoadVideo(string videoId)
     {
+        Console.WriteLine($"Loading video id: {videoId}");
         await LoadYT();
         await JsInterop.LoadVideoById(videoId);
+        LoadedVideoId = videoId;
+        await RefreshCarouselState();
     }
 
     /// <summary>
@@ -83,6 +109,7 @@
     {
         await LoadYT();
         await JsInterop.PlayVideo();
+        await RefreshCarouselState();
     }
 
     /// <summary>
@@ -92,5 +119,17 @@
     {
         await LoadYT();
         await JsInterop.PauseVideo();
+        await RefreshCarouselState();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        // Carousel refresh needed in case client updates suggestion video list parameter
+        if (LoadedVideoId != null)
+        {
+            await RefreshCarouselState();
+        }
     }
 }

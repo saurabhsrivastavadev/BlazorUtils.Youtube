@@ -34,24 +34,34 @@ namespace BlazorUtils.YTPlayer
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("loadVideoById", videoId);
+            await Task.Delay(100);
         }
 
         public async ValueTask PlayVideo()
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("playVideo");
+            await Task.Delay(100);
         }
 
         public async ValueTask PauseVideo()
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("pauseVideo");
+            await Task.Delay(100);
+        }
+
+        public async ValueTask<bool> IsVideoPlaying()
+        {
+            var module = await moduleTask.Value;
+            return await module.InvokeAsync<bool>("isVideoPlaying");
         }
 
         public async ValueTask TogglePlayPause()
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("togglePlayPause");
+            await Task.Delay(100);
         }
 
         public async ValueTask DisposeAsync()

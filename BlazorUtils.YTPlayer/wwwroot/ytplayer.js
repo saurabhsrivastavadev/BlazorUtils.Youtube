@@ -46,6 +46,18 @@ export function loadVideoById(videoId) {
         'videoId': videoId,
     });
     isVideoLoaded = true;
+    let state = player.getPlayerState();
+}
+
+export function isVideoPlaying() {
+
+    if (!isVideoLoaded) {
+        console.error('video not yet loaded.');
+        return false;
+    }
+    let state = player.getPlayerState();
+    return (state === YT.PlayerState.PLAYING ||
+                state === YT.PlayerState.BUFFERING);
 }
 
 export function togglePlayPause() {

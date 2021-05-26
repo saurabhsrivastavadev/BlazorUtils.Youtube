@@ -3,22 +3,37 @@
 
 <h1>YTPlayer Demo</h1>
 
-<p>Here goes..</p>
+<p @onclick="HandleClick">Here goes..</p>
 
-<BlazorUtils.YTPlayer.YTPlayer @ref="player" Width="80vw" HeightPx="600"></BlazorUtils.YTPlayer.YTPlayer>
+<BlazorUtils.YTPlayer.YTPlayer @ref="player" 
+                               Width="80vw" HeightPx="600"
+                               SuggestionVideoIdList="_suggestionList">
+</BlazorUtils.YTPlayer.YTPlayer>
 
 @code {
 
     BlazorUtils.YTPlayer.YTPlayer player;
 
+    private List<string> _suggestionList = new List<string> {
+                                    "JXeJANDKwDc", "F6f3cFD-nlM", "XRr1kaXKBsU",
+                                    "JYQHTLgtLzQ", "gIPWGalCJGg", "Tqsz6fjvhZM",
+                                    "cbjyMfwRCPA", "8zGXI5bwTag", "FM7MFYoylVs",
+                                    "7gphiFVVtUI"};
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        if (player != null)
+        if (player != null && firstRender)
         {
             await player.LoadVideo("M7lc1UVf-VE");
-            await player.PlayVideo();
         }
+    }
+
+    private void HandleClick()
+    {
+        // _suggestionList.Clear();
+        _suggestionList = new List<string> {
+                                    "JXeJANDKwDc", "F6f3cFD-nlM", "XRr1kaXKBsU"};
     }
 }
