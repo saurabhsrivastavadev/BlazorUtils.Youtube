@@ -1,9 +1,10 @@
 ﻿@inject Microsoft.JSInterop.IJSRuntime JSR
 
-<div class="main-container" style="width: @Width; height:@(HeightPx)px;">
+<div @ref="MainContainerRef"
+     class="main-container" style="width: @Width; height: @(Height);">
 
     <div class="player-row" @onclick="PlayerDivClicked" style="width: 100%; height: @(HeightPx - CarouselHeightPx)px;">
-        <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%;">
+        <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%; text-align: center;">
             Loading the player..
         </div>
     </div>
@@ -25,7 +26,7 @@
 @code {
 
     [Parameter]
-    public int HeightPx { get; set; } = 500;
+    public string Height { get; set; } = "500px";
 
     [Parameter]
     public string Width { get; set; } = "100%";
@@ -41,11 +42,14 @@
 
     private string LoadedVideoId { get; set; } = null;
 
+    private ElementReference MainContainerRef { get; set; }
+
+    private int HeightPx { get; set; } = 300;
+
     private async Task LoadYT()
     {
         if (!JsInteropLoadComplete)
         {
-            JsInterop = new YTPlayerJsInterop(JSR);
             JsInteropLoadComplete = true;
             await JsInterop.LoadYT();
         }
@@ -86,6 +90,19 @@
     {
         await LoadVideo(videoId);
         await PlayVideo();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (JsInterop == null) JsInterop = new YTPlayerJsInterop(JSR);
+        int mainContainerHeight = await JsInterop.GetPlayerHeightPx(MainContainerRef);
+        if (HeightPx != mainContainerHeight)
+        {
+            HeightPx = mainContainerHeight;
+            StateHasChanged();
+        }
     }
 
     /// <summary>

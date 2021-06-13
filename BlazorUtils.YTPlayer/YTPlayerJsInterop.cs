@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
@@ -62,6 +63,17 @@ namespace BlazorUtils.YTPlayer
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("togglePlayPause");
             await Task.Delay(100);
+        }
+
+        public async ValueTask<int> GetPlayerHeightPx(ElementReference playerContainer)
+        {
+            var module = await moduleTask.Value;
+            return await module.InvokeAsync<int>("getPlayerHeightPx", playerContainer);
+        }
+        public async ValueTask<int> GetPlayerWidthPx(ElementReference playerContainer)
+        {
+            var module = await moduleTask.Value;
+            return await module.InvokeAsync<int>("getPlayerWidthPx", playerContainer);
         }
 
         public async ValueTask DisposeAsync()

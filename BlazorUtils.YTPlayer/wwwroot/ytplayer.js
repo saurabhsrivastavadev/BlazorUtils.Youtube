@@ -74,3 +74,12 @@ export function togglePlayPause() {
         player.playVideo();
     }
 }
+
+export function getPlayerHeightPx(playerHtmlElement) {
+
+    return playerHtmlElement.offsetHeight;
+}
+export function getPlayerWidthPx(playerHtmlElement) {
+
+    return playerHtmlElement.offsetWidth;
+}
