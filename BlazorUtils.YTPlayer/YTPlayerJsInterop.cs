@@ -15,6 +15,19 @@ namespace BlazorUtils.YTPlayer
     public class YTPlayerJsInterop : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+        private int SlowNetworkRetryCount { get; } = 11;
+
+        private int JsApiDelayMs { get; } = 100;
+
+        public enum YTPlayerState 
+        {
+            UNSTARTED   = -1, 
+            ENDED       = 0,
+            PLAYING     = 1,
+            PAUSED      = 2,
+            BUFFERING   = 3,
+            VIDEO_CUED  = 4
+        }
 
         public YTPlayerJsInterop(IJSRuntime jsRuntime)
         {
@@ -26,43 +39,74 @@ namespace BlazorUtils.YTPlayer
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("loadYTPlayer");
-            await Task.Delay(1000);
-            await module.InvokeVoidAsync("onYouTubePlayerAPIReady");
-            await Task.Delay(1000);
+
+            // retry few times to handle slow networks 
+            bool playerReady = false;
+            int retries = 0;
+            while (!playerReady && retries++ < SlowNetworkRetryCount)
+            {
+                try
+                {
+                    await module.InvokeVoidAsync("onYouTubePlayerAPIReady");
+                    playerReady = true;
+                }
+                catch 
+                {
+                    if (retries > 1) Console.WriteLine($"slow network retry {retries}");
+                    await Task.Delay(500);
+                }
+            }
+
+            await Task.Delay(JsApiDelayMs);
         }
 
         public async ValueTask LoadVideoById(string videoId)
         {
             var module = await moduleTask.Value;
-            await module.InvokeVoidAsync("loadVideoById", videoId);
-            await Task.Delay(100);
+            bool playerReady = false;
+            int retries = 0;
+            while (!playerReady && retries++ < SlowNetworkRetryCount)
+            {
+                try
+                {
+                    await module.InvokeVoidAsync("loadVideoById", videoId);
+                    playerReady = true;
+                }
+                catch 
+                {
+                    await Task.Delay(500);
+                    if (retries > 1) Console.WriteLine($"slow network retry {retries}");
+                }
+            }
+
+            await Task.Delay(JsApiDelayMs);
         }
 
         public async ValueTask PlayVideo()
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("playVideo");
-            await Task.Delay(100);
+            await Task.Delay(JsApiDelayMs);
         }
 
         public async ValueTask PauseVideo()
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("pauseVideo");
-            await Task.Delay(100);
+            await Task.Delay(JsApiDelayMs);
         }
 
-        public async ValueTask<bool> IsVideoPlaying()
+        public async ValueTask<YTPlayerState> GetPlayerState()
         {
             var module = await moduleTask.Value;
-            return await module.InvokeAsync<bool>("isVideoPlaying");
+            return (YTPlayerState)await module.InvokeAsync<int>("getPlayerState");
         }
 
         public async ValueTask TogglePlayPause()
         {
             var module = await moduleTask.Value;
             await module.InvokeVoidAsync("togglePlayPause");
-            await Task.Delay(100);
+            await Task.Delay(JsApiDelayMs);
         }
 
         public async ValueTask<int> GetPlayerHeightPx(ElementReference playerContainer)
