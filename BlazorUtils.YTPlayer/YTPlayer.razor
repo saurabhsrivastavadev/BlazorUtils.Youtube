@@ -3,16 +3,39 @@
 <div @ref="MainContainerRef"
      class="main-container" style="width: @Width; height: @(Height);">
 
-    <div class="player-row" @onclick="PlayerDivClicked" style="width: 100%; height: @(HeightPx - CarouselHeightPx)px;">
+    <div class="player-row" @onclick="PlayerDivClicked" style="width: 100%; 
+            height: @(HeightPx - (CarouselHeightPx * GetSuggestionRowCount()))px;">
         <div id="ytplayer" style="pointer-events: none; width: 100%; height: 100%; text-align: center;">
             Loading the player..
         </div>
     </div>
 
-    @if (SuggestionVideoIdList != null && SuggestionVideoIdList.Count > 0)
+    @if (SuggestionVideoIdListRow1 != null && SuggestionVideoIdListRow1.Count > 0)
     {
         <div class="suggestion-row" style="height: @(CarouselHeightPx) px; display: @CarouselDisplay;">
-            @foreach (var videoId in SuggestionVideoIdList)
+            @foreach (var videoId in SuggestionVideoIdListRow1)
+            {
+                <div class="suggestion-element" @onclick="_ => SuggestionVideoClicked(videoId)">
+                    <img height="@(CarouselHeightPx-15)px" src="https://img.youtube.com/vi/@(videoId)/0.jpg">
+                </div>
+            }
+        </div>
+    }
+    @if (SuggestionVideoIdListRow2 != null && SuggestionVideoIdListRow2.Count > 0)
+    {
+        <div class="suggestion-row" style="height: @(CarouselHeightPx) px; display: @CarouselDisplay;">
+            @foreach (var videoId in SuggestionVideoIdListRow2)
+            {
+                <div class="suggestion-element" @onclick="_ => SuggestionVideoClicked(videoId)">
+                    <img height="@(CarouselHeightPx-15)px" src="https://img.youtube.com/vi/@(videoId)/0.jpg">
+                </div>
+            }
+        </div>
+    }
+    @if (SuggestionVideoIdListRow3 != null && SuggestionVideoIdListRow3.Count > 0)
+    {
+        <div class="suggestion-row" style="height: @(CarouselHeightPx) px; display: @CarouselDisplay;">
+            @foreach (var videoId in SuggestionVideoIdListRow3)
             {
                 <div class="suggestion-element" @onclick="_ => SuggestionVideoClicked(videoId)">
                     <img height="@(CarouselHeightPx-15)px" src="https://img.youtube.com/vi/@(videoId)/0.jpg">
@@ -31,8 +54,16 @@
     [Parameter]
     public string Width { get; set; } = "100%";
 
+    /// <summary>
+    /// Suggestion video carousel split in 3 rows.
+    /// Each row suggestions can be specified individually.
+    /// </summary>
     [Parameter]
-    public List<string> SuggestionVideoIdList { get; set; }
+    public List<string> SuggestionVideoIdListRow1 { get; set; }
+    [Parameter]
+    public List<string> SuggestionVideoIdListRow2 { get; set; }
+    [Parameter]
+    public List<string> SuggestionVideoIdListRow3 { get; set; }
 
     private YTPlayerJsInterop JsInterop { get; set; }
     private bool JsInteropLoadComplete { get; set; }
@@ -63,17 +94,31 @@
 
     private async Task TogglePlaybackAndCarousel()
     {
+        var oldState = await JsInterop.GetPlayerState();
+
         // Toggle playback first and then carousel based on player state
         await JsInterop.TogglePlayPause();
+
+        // wait for state toggle to complete
+        if (oldState == YTPlayerJsInterop.YTPlayerState.PLAYING)
+        {
+            await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PAUSED);
+        }
+        else
+        {
+            await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PLAYING);
+        }
+
         await RefreshCarouselState();
     }
 
     private async Task RefreshCarouselState()
     {
-        bool suggestionsAvailable =
-            SuggestionVideoIdList != null && SuggestionVideoIdList.Count > 0;
-        bool isVideoPlaying = await JsInterop.IsVideoPlaying();
+        bool suggestionsAvailable = GetSuggestionRowCount() > 0;
+        bool isVideoPlaying =
+            ((await JsInterop.GetPlayerState()) == YTPlayerJsInterop.YTPlayerState.PLAYING);
 
+        Console.WriteLine($"RefreshCarouselState() isVideoPlaying: {isVideoPlaying}");
         if (!suggestionsAvailable || isVideoPlaying)
         {
             CarouselDisplay = "none";
@@ -93,9 +138,34 @@
         await PlayVideo();
     }
 
+    private async Task WaitForPlayerState(
+        YTPlayerJsInterop.YTPlayerState waitForState, int maxWaitMillis = 2000)
+    {
+        int waited = 0;
+        int waitSlice = 100;
+        var state = await JsInterop.GetPlayerState();
+        while (waited < maxWaitMillis && state != waitForState)
+        {
+            await Task.Delay(waitSlice);
+            state = await JsInterop.GetPlayerState();
+            waited += waitSlice;
+        }
+    }
+
+    private int GetSuggestionRowCount()
+    {
+        int rowCount = 0;
+        if (SuggestionVideoIdListRow1 != null && SuggestionVideoIdListRow1.Count > 0) rowCount++;
+        if (SuggestionVideoIdListRow2 != null && SuggestionVideoIdListRow2.Count > 0) rowCount++;
+        if (SuggestionVideoIdListRow3 != null && SuggestionVideoIdListRow3.Count > 0) rowCount++;
+        return rowCount;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
+
+        Console.WriteLine($"onafterrenderasync, carousel height = {CarouselHeightPx}");
 
         if (JsInterop == null) JsInterop = new YTPlayerJsInterop(JSR);
         int mainContainerHeight = await JsInterop.GetPlayerHeightPx(MainContainerRef);
@@ -127,6 +197,7 @@
     {
         await LoadYT();
         await JsInterop.PlayVideo();
+        await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PLAYING);
         await RefreshCarouselState();
     }
 
@@ -137,6 +208,7 @@
     {
         await LoadYT();
         await JsInterop.PauseVideo();
+        await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PAUSED);
         await RefreshCarouselState();
     }
 
