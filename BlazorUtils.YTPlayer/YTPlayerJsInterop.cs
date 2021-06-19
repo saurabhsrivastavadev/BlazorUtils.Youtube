@@ -99,7 +99,12 @@ namespace BlazorUtils.YTPlayer
         public async ValueTask<YTPlayerState> GetPlayerState()
         {
             var module = await moduleTask.Value;
-            return (YTPlayerState)await module.InvokeAsync<int>("getPlayerState");
+            try
+            {
+                return (YTPlayerState)await module.InvokeAsync<int>("getPlayerState");
+            }
+            catch (Exception) { }
+            return YTPlayerState.UNSTARTED;
         }
 
         public async ValueTask TogglePlayPause()
@@ -112,12 +117,22 @@ namespace BlazorUtils.YTPlayer
         public async ValueTask<int> GetPlayerHeightPx(ElementReference playerContainer)
         {
             var module = await moduleTask.Value;
-            return await module.InvokeAsync<int>("getPlayerHeightPx", playerContainer);
+            try
+            {
+                return await module.InvokeAsync<int>("getPlayerHeightPx", playerContainer);
+            }
+            catch (Exception) { }
+            return 0;
         }
         public async ValueTask<int> GetPlayerWidthPx(ElementReference playerContainer)
         {
             var module = await moduleTask.Value;
-            return await module.InvokeAsync<int>("getPlayerWidthPx", playerContainer);
+            try
+            {
+                return await module.InvokeAsync<int>("getPlayerWidthPx", playerContainer);
+            }
+            catch (Exception) { }
+            return 0;
         }
 
         public async ValueTask DisposeAsync()

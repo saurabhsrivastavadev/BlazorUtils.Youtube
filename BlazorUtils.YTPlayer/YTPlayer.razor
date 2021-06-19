@@ -165,8 +165,6 @@
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        Console.WriteLine($"onafterrenderasync, carousel height = {CarouselHeightPx}");
-
         if (JsInterop == null) JsInterop = new YTPlayerJsInterop(JSR);
         int mainContainerHeight = await JsInterop.GetPlayerHeightPx(MainContainerRef);
         if (HeightPx != mainContainerHeight)
