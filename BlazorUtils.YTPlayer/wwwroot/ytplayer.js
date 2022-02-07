@@ -90,7 +90,7 @@ export function pauseVideo() {
 
 export function loadVideoById(videoId) {
 
-    player.loadVideoById({
+    player.cueVideoById({
         'videoId': videoId,
     });
     isVideoLoaded = true;
@@ -102,6 +102,7 @@ export function getPlayerState() {
         console.error('video not yet loaded.');
         return new YTPlayerState(false);
     }
+
     return new YTPlayerState(true, { streamState: player.getPlayerState() });
 }
 
