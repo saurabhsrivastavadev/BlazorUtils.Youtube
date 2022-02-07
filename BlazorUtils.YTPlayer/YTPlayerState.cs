@@ -10,7 +10,7 @@ namespace BlazorUtils.YTPlayer
     {
         public enum VideoStreamState
         {
-            UNSTARTED = -1,
+            UNLOADED = -1,
             ENDED = 0,
             PLAYING = 1,
             PAUSED = 2,
@@ -26,6 +26,6 @@ namespace BlazorUtils.YTPlayer
         /// <summary>
         /// Video player stream state
         /// </summary>
-        public VideoStreamState StreamState { get; set; } = VideoStreamState.UNSTARTED;
+        public VideoStreamState StreamState { get; set; } = VideoStreamState.UNLOADED;
     }
 }

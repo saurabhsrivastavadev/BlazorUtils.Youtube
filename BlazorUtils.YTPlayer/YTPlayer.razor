@@ -38,6 +38,12 @@
     [Parameter]
     public List<string> SuggestionVideoIdList { get; set; }
 
+    /// <summary>
+    /// Callback invoked on player state change, such as video played,paused,loaded.
+    /// </summary>
+    [Parameter]
+    public EventCallback<YTPlayerState> OnPlayerStateChange { get; set; }
+
     private YTPlayerJsInterop JsInterop { get; set; }
     private bool JsInteropLoadComplete { get; set; }
 
@@ -59,10 +65,20 @@
         }
     }
 
+    private async Task InvokeStateChangeCb()
+    {
+        if (OnPlayerStateChange.HasDelegate)
+        {
+            var state = await JsInterop.GetPlayerState();
+            await OnPlayerStateChange.InvokeAsync(state);
+        }
+    }
+
     private async Task PlayerDivClicked()
     {
         await LoadYT();
         await TogglePlaybackAndCarousel();
+        await InvokeStateChangeCb();
     }
 
     private async Task TogglePlaybackAndCarousel()
@@ -92,7 +108,6 @@
             ((await JsInterop.GetPlayerState()).StreamState == 
                                     YTPlayerState.VideoStreamState.PLAYING);
 
-        Console.WriteLine($"RefreshCarouselState() isVideoPlaying: {isVideoPlaying}");
         if (!suggestionsAvailable || isVideoPlaying)
         {
             CarouselDisplay = "none";
@@ -157,6 +172,7 @@
         await JsInterop.LoadVideoById(videoId);
         LoadedVideoId = videoId;
         await RefreshCarouselState();
+        await InvokeStateChangeCb();
     }
 
     /// <summary>
@@ -169,6 +185,7 @@
         await JsInterop.PlayVideo();
         await WaitForPlayerState(YTPlayerState.VideoStreamState.PLAYING);
         await RefreshCarouselState();
+        await InvokeStateChangeCb();
     }
 
     /// <summary>
@@ -180,6 +197,7 @@
         await JsInterop.PauseVideo();
         await WaitForPlayerState(YTPlayerState.VideoStreamState.PAUSED);
         await RefreshCarouselState();
+        await InvokeStateChangeCb();
     }
 
     protected override async Task OnParametersSetAsync()

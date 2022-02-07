@@ -1,7 +1,7 @@
 // Module to work with YouTube Player IFrame API
 
 // Constants 
-const YT_PLAYER_STATE_UNSTARTED = -1;
+const YT_PLAYER_STATE_UNLOADED = -1;
 const YT_PLAYER_STATE_ENDED = 0;
 const YT_PLAYER_STATE_PLAYING = 1;
 const YT_PLAYER_STATE_PAUSED = 2;
@@ -42,7 +42,7 @@ class YTPlayerState {
                     this.streamState = YT_PLAYER_STATE_CUED;
                     break;
                 default:
-                    this.streamState = YT_PLAYER_STATE_UNSTARTED;
+                    this.streamState = YT_PLAYER_STATE_UNLOADED;
                     break;
             }
         }
