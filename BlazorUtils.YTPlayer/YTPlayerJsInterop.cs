@@ -5,29 +5,15 @@ using System.Threading.Tasks;
 
 namespace BlazorUtils.YTPlayer
 {
-    // This class provides an example of how JavaScript functionality can be wrapped
-    // in a .NET class for easy consumption. The associated JavaScript module is
-    // loaded on demand when first needed.
-    //
-    // This class can be registered as scoped DI service and then injected into Blazor
-    // components for use.
-
+    /// <summary>
+    /// Class for interacting with ytplayer.js script
+    /// </summary>
     public class YTPlayerJsInterop : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
         private int SlowNetworkRetryCount { get; } = 11;
 
         private int JsApiDelayMs { get; } = 100;
-
-        public enum YTPlayerState 
-        {
-            UNSTARTED   = -1, 
-            ENDED       = 0,
-            PLAYING     = 1,
-            PAUSED      = 2,
-            BUFFERING   = 3,
-            VIDEO_CUED  = 4
-        }
 
         public YTPlayerJsInterop(IJSRuntime jsRuntime)
         {
@@ -101,10 +87,11 @@ namespace BlazorUtils.YTPlayer
             var module = await moduleTask.Value;
             try
             {
-                return (YTPlayerState)await module.InvokeAsync<int>("getPlayerState");
+                var state = await module.InvokeAsync<YTPlayerState>("getPlayerState");
+                return state;
             }
             catch (Exception) { }
-            return YTPlayerState.UNSTARTED;
+            return null;
         }
 
         public async ValueTask TogglePlayPause()

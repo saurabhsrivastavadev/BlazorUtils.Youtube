@@ -1,7 +1,55 @@
-// This is a JavaScript module that is loaded on demand. 
-// It can export any number of functions, and may import 
-// other JavaScript modules if required.
+// Module to work with YouTube Player IFrame API
 
+// Constants 
+const YT_PLAYER_STATE_UNSTARTED = -1;
+const YT_PLAYER_STATE_ENDED = 0;
+const YT_PLAYER_STATE_PLAYING = 1;
+const YT_PLAYER_STATE_PAUSED = 2;
+const YT_PLAYER_STATE_BUFFERING = 3;
+const YT_PLAYER_STATE_CUED = 4;
+
+/**
+ * Class representing the player state
+ * */
+class YTPlayerState {
+
+    constructor(success, stateParams) {
+
+        this.success = success;
+
+        if (stateParams.streamState) {
+            /** Integer value with below possible YT library namespace variables.
+             * YT.PlayerState.ENDED
+               YT.PlayerState.PLAYING
+               YT.PlayerState.PAUSED
+               YT.PlayerState.BUFFERING
+               YT.PlayerState.CUED
+             * */
+            switch (stateParams.streamState) {
+                case YT.PlayerState.ENDED:
+                    this.streamState = YT_PLAYER_STATE_ENDED;
+                    break;
+                case YT.PlayerState.PLAYING:
+                    this.streamState = YT_PLAYER_STATE_PLAYING;
+                    break;
+                case YT.PlayerState.PAUSED:
+                    this.streamState = YT_PLAYER_STATE_PAUSED;
+                    break;
+                case YT.PlayerState.BUFFERING:
+                    this.streamState = YT_PLAYER_STATE_BUFFERING;
+                    break;
+                case YT.PlayerState.CUED:
+                    this.streamState = YT_PLAYER_STATE_CUED;
+                    break;
+                default:
+                    this.streamState = YT_PLAYER_STATE_UNSTARTED;
+                    break;
+            }
+        }
+    }
+}
+
+// Module variables
 let player;
 let isVideoLoaded = false;
 
@@ -46,16 +94,15 @@ export function loadVideoById(videoId) {
         'videoId': videoId,
     });
     isVideoLoaded = true;
-    let state = player.getPlayerState();
 }
 
 export function getPlayerState() {
 
     if (!isVideoLoaded) {
         console.error('video not yet loaded.');
-        return false;
+        return new YTPlayerState(false);
     }
-    return player.getPlayerState();
+    return new YTPlayerState(true, { streamState: player.getPlayerState() });
 }
 
 export function togglePlayPause() {
@@ -66,7 +113,7 @@ export function togglePlayPause() {
     }
 
     let state = player.getPlayerState();
-    if (state === 1) {
+    if (state === YT.PlayerState.PLAYING) {
         player.pauseVideo();
     } else {
         player.playVideo();

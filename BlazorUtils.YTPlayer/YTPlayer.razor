@@ -35,10 +35,6 @@
     [Parameter]
     public string Width { get; set; } = "100%";
 
-    /// <summary>
-    /// Suggestion video carousel split in 3 rows.
-    /// Each row suggestions can be specified individually.
-    /// </summary>
     [Parameter]
     public List<string> SuggestionVideoIdList { get; set; }
 
@@ -77,13 +73,13 @@
         await JsInterop.TogglePlayPause();
 
         // wait for state toggle to complete
-        if (oldState == YTPlayerJsInterop.YTPlayerState.PLAYING)
+        if (oldState.StreamState == YTPlayerState.VideoStreamState.PLAYING)
         {
-            await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PAUSED);
+            await WaitForPlayerState(YTPlayerState.VideoStreamState.PAUSED);
         }
         else
         {
-            await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PLAYING);
+            await WaitForPlayerState(YTPlayerState.VideoStreamState.PLAYING);
         }
 
         await RefreshCarouselState();
@@ -93,7 +89,8 @@
     {
         bool suggestionsAvailable = GetSuggestionRowCount() > 0;
         bool isVideoPlaying =
-            ((await JsInterop.GetPlayerState()) == YTPlayerJsInterop.YTPlayerState.PLAYING);
+            ((await JsInterop.GetPlayerState()).StreamState == 
+                                    YTPlayerState.VideoStreamState.PLAYING);
 
         Console.WriteLine($"RefreshCarouselState() isVideoPlaying: {isVideoPlaying}");
         if (!suggestionsAvailable || isVideoPlaying)
@@ -116,12 +113,12 @@
     }
 
     private async Task WaitForPlayerState(
-        YTPlayerJsInterop.YTPlayerState waitForState, int maxWaitMillis = 2000)
+        YTPlayerState.VideoStreamState waitForState, int maxWaitMillis = 2000)
     {
         int waited = 0;
         int waitSlice = 100;
         var state = await JsInterop.GetPlayerState();
-        while (waited < maxWaitMillis && state != waitForState)
+        while (waited < maxWaitMillis && state.StreamState != waitForState)
         {
             await Task.Delay(waitSlice);
             state = await JsInterop.GetPlayerState();
@@ -170,7 +167,7 @@
     {
         await LoadYT();
         await JsInterop.PlayVideo();
-        await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PLAYING);
+        await WaitForPlayerState(YTPlayerState.VideoStreamState.PLAYING);
         await RefreshCarouselState();
     }
 
@@ -181,7 +178,7 @@
     {
         await LoadYT();
         await JsInterop.PauseVideo();
-        await WaitForPlayerState(YTPlayerJsInterop.YTPlayerState.PAUSED);
+        await WaitForPlayerState(YTPlayerState.VideoStreamState.PAUSED);
         await RefreshCarouselState();
     }
 
