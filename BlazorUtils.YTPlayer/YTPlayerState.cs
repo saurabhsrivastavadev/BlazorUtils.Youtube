@@ -27,5 +27,10 @@ namespace BlazorUtils.YTPlayer
         /// Video player stream state
         /// </summary>
         public VideoStreamState StreamState { get; set; } = VideoStreamState.UNLOADED;
+
+        /// <summary>
+        /// URL of the video which is loaded, either paused or playing.
+        /// </summary>
+        public string LoadedVideoUrl { get; set; }
     }
 }

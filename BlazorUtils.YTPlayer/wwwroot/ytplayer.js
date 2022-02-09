@@ -46,6 +46,10 @@ class YTPlayerState {
                     break;
             }
         }
+
+        if (stateParams.loadedVideoUrl) {
+            this.loadedVideoUrl = stateParams.loadedVideoUrl;
+        }
     }
 }
 
@@ -103,7 +107,11 @@ export function getPlayerState() {
         return new YTPlayerState(false);
     }
 
-    return new YTPlayerState(true, { streamState: player.getPlayerState() });
+    return new YTPlayerState(true,
+        {
+            streamState: player.getPlayerState(),
+            loadedVideoUrl: player.getVideoUrl()
+        });
 }
 
 export function togglePlayPause() {
