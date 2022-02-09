@@ -172,6 +172,8 @@
         await JsInterop.LoadVideoById(videoId);
         LoadedVideoId = videoId;
         await RefreshCarouselState();
+        // wait a while so player specifies correct video url
+        await Task.Delay(100);
         await InvokeStateChangeCb();
     }
 
