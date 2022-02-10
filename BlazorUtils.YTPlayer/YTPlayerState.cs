@@ -32,5 +32,10 @@ namespace BlazorUtils.YTPlayer
         /// URL of the video which is loaded, either paused or playing.
         /// </summary>
         public string LoadedVideoUrl { get; set; }
+
+        /// <summary>
+        /// Video ID extracted from the above Video URL
+        /// </summary>
+        public string LoadedVideoId { get; set; }
     }
 }

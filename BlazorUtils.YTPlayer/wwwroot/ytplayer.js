@@ -50,6 +50,10 @@ class YTPlayerState {
         if (stateParams.loadedVideoUrl) {
             this.loadedVideoUrl = stateParams.loadedVideoUrl;
         }
+
+        if (stateParams.loadedVideoId) {
+            this.loadedVideoId = stateParams.loadedVideoId;
+        }
     }
 }
 
@@ -107,10 +111,14 @@ export function getPlayerState() {
         return new YTPlayerState(false);
     }
 
+    let videoUrl = player.getVideoUrl();
+    let videoId = extractVideoIdFromUrl(videoUrl);
+
     return new YTPlayerState(true,
         {
             streamState: player.getPlayerState(),
-            loadedVideoUrl: player.getVideoUrl()
+            loadedVideoUrl: videoUrl,
+            loadedVideoId: videoId
         });
 }
 
@@ -136,4 +144,27 @@ export function getPlayerHeightPx(playerHtmlElement) {
 export function getPlayerWidthPx(playerHtmlElement) {
 
     return playerHtmlElement.offsetWidth;
+}
+
+// Private functions
+
+/**
+ * Function to extract youtube video id from url.
+ * @param {string} videoUrl
+ * @returns {string}
+ */
+function extractVideoIdFromUrl(videoUrl) {
+
+    try {
+        const url = new URL(videoUrl);
+        if (url.hostname.includes('youtube.com')) {
+            return url.searchParams.get('v');
+        } else if (url.hostname.includes('youtu.be')) {
+            return url.pathname.substring(1);
+        }
+    } catch (error) {
+        console.log(error)
+    }
+
+    return null;
 }
